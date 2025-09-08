@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
 import { OrderEntity } from '@/database/entities/order.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { IOrderRepository } from '@/database/repositories/interfaces/order.repository.interface';
+import { REPOSITORY_TOKENS } from '@/database/repositories/constants';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(OrderEntity)
-    private ordersRepository: Repository<OrderEntity>,
+    @Inject(REPOSITORY_TOKENS.ORDER_REPOSITORY)
+    private readonly orderRepository: IOrderRepository,
   ) {}
 
-  listOrders(): Promise<OrderEntity[]> {
-    return this.ordersRepository.find();
+  async listOrders() {
+    // Get orders with customer and store information using repository
+    return this.orderRepository.findOrdersWithRelations();
   }
 
   cancelOrder(id: string, refund: boolean): Promise<OrderEntity> {

@@ -10,6 +10,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') ?? 3000;
 
+  app.enableCors();
+
   setupSwagger(app);
   await app.listen(port);
   logger.log(`🚀 Application is running on: http://localhost:${port}`);

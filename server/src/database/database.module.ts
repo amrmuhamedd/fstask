@@ -10,7 +10,7 @@ import { CustomerEntity } from './entities/customer.entity';
       type: 'sqlite',
       database: 'database/db.sqlite',
       entities: [OrderEntity, StoreEntity, CustomerEntity],
-      synchronize: false,
+      synchronize: true,
       logging: true,
     }),
   ],

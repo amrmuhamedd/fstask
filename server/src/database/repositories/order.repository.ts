@@ -51,4 +51,13 @@ export class OrderRepository implements IOrderRepository {
       updated_at: order.order_updated_at,
     }));
   }
+
+   async findOrderById(id: number): Promise<OrderEntity | null> {
+    return this.orderEntityRepository.findOne({
+      where: { id }
+    });
+  }
+   async saveOrder(order: OrderEntity): Promise<OrderEntity> {
+    return this.orderEntityRepository.save(order);
+  }
 }

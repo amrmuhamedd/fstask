@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { OrderStatus } from '../enums/order-status.enum';
 
 @Entity({ name: 'orders' })
 export class OrderEntity {
@@ -11,8 +12,12 @@ export class OrderEntity {
   @Column({ type: 'int' })
   customer_id: number;
 
-  @Column({ type: 'text', default: 'pendingPayment' })
-  status: 'pendingPayment' | 'confirmed' | 'cancelled';
+  @Column({ 
+    type: 'text', 
+    default: OrderStatus.PENDING_PAYMENT,
+    enum: OrderStatus
+  })
+  status: OrderStatus;
 
   @Column({ type: 'int' })
   amount_cents: number;

@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnprocessableEntityException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+  Inject,
+} from '@nestjs/common';
 import { IOrderRepository } from '@/database/repositories/interfaces/order.repository.interface';
 import { IStoreRepository } from '@/database/repositories/interfaces/store.repository.interface';
 import { IStoreTransactionEventRepository } from '@/database/repositories/interfaces/store-transaction-event.repository.interface';
@@ -20,7 +25,7 @@ export class OrdersService {
   async listOrders() {
     return this.orderRepository.findOrdersWithRelations();
   }
-  
+
   async cancelOrder(id: string, refund: boolean) {
     const order = await this.orderRepository.findOrderById(Number(id));
 
@@ -28,14 +33,12 @@ export class OrdersService {
       throw new NotFoundException('Order not found');
     }
 
-
     if (refund) {
       const store = await this.storeRepository.findStoreById(order.store_id);
 
       if (!store) {
         throw new NotFoundException('Store not found');
       }
-
 
       if (store.balance_cents < order.amount_cents) {
         throw new UnprocessableEntityException({
@@ -45,38 +48,34 @@ export class OrdersService {
           details: {
             available: store.balance_cents,
             required: order.amount_cents,
-            orderId: order.id
-          }
+            orderId: order.id,
+          },
         });
       }
 
-  
       const newBalance = store.balance_cents - order.amount_cents;
       store.balance_cents = newBalance;
       await this.storeRepository.saveStore(store);
-      
 
       await this.storeTransactionEventRepository.recordTransaction(
         store.id,
         TransactionType.REFUND,
-        -order.amount_cents, 
+        -order.amount_cents,
         newBalance,
         order.id,
-        `Refund for cancelled order #${order.id}`
+        `Refund for cancelled order #${order.id}`,
       );
     }
 
-
-    order.status = OrderStatus.CANCELLED; 
+    order.status = OrderStatus.CANCELLED;
     order.updated_at = new Date();
     await this.orderRepository.saveOrder(order);
 
-    
     return {
       id: order.id,
       status: order.status,
       refunded: refund,
-      updated_at: order.updated_at
+      updated_at: order.updated_at,
     };
   }
 }

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { OrderEntity } from '@/database/entities/order.entity';
 import { CustomerEntity } from '@/database/entities/customer.entity';
 import { StoreEntity } from '@/database/entities/store.entity';
+import { OrderStatus } from '@/database/enums/order-status.enum';
 import {
   IOrderRepository,
   OrderWithRelations,
@@ -17,6 +18,18 @@ export class OrderRepository implements IOrderRepository {
   ) {}
 
   async findOrdersWithRelations(): Promise<OrderWithRelations[]> {
+    interface OrderRawResult {
+      order_id: number;
+      order_store_id: number;
+      order_customer_id: number;
+      order_status: string;
+      order_amount_cents: number;
+      order_created_at: Date;
+      order_updated_at: Date;
+      store_name: string;
+      customer_name: string;
+    }
+
     const orders = await this.orderEntityRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect(
@@ -26,38 +39,37 @@ export class OrderRepository implements IOrderRepository {
       )
       .leftJoinAndSelect(StoreEntity, 'store', 'store.id = order.store_id')
       .select([
-        'order.id',
-        'order.store_id',
-        'order.customer_id',
-        'order.status',
-        'order.amount_cents',
-        'order.created_at',
-        'order.updated_at',
+        'order.id as order_id',
+        'order.store_id as order_store_id',
+        'order.customer_id as order_customer_id',
+        'order.status as order_status',
+        'order.amount_cents as order_amount_cents',
+        'order.created_at as order_created_at',
+        'order.updated_at as order_updated_at',
         'customer.name as customer_name',
         'store.name as store_name',
       ])
       .getRawMany();
 
-
-    return orders.map((order) => ({
+    return (orders as OrderRawResult[]).map((order) => ({
       id: order.order_id,
       store_id: order.order_store_id,
       customer_id: order.order_customer_id,
       store_name: order.store_name,
       customer_name: order.customer_name,
-      status: order.order_status,
+      status: order.order_status as OrderStatus,
       amount_cents: order.order_amount_cents,
       created_at: order.order_created_at,
       updated_at: order.order_updated_at,
     }));
   }
 
-   async findOrderById(id: number): Promise<OrderEntity | null> {
+  async findOrderById(id: number): Promise<OrderEntity | null> {
     return this.orderEntityRepository.findOne({
-      where: { id }
+      where: { id },
     });
   }
-   async saveOrder(order: OrderEntity): Promise<OrderEntity> {
+  async saveOrder(order: OrderEntity): Promise<OrderEntity> {
     return this.orderEntityRepository.save(order);
   }
 }

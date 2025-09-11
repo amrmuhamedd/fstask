@@ -1,9 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+} from 'typeorm';
 
 export enum TransactionType {
   REFUND = 'REFUND',
   PAYMENT = 'PAYMENT',
-  ADJUSTMENT = 'ADJUSTMENT'
+  ADJUSTMENT = 'ADJUSTMENT',
 }
 
 @Entity({ name: 'store_transaction_events' })
@@ -17,7 +22,7 @@ export class StoreTransactionEventEntity {
   @Column({
     type: 'varchar',
     length: 50,
-    enum: TransactionType
+    enum: TransactionType,
   })
   type: TransactionType;
 
@@ -29,7 +34,7 @@ export class StoreTransactionEventEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   description: string | null;
-  
+
   @Column({ type: 'int' })
   balance_after_cents: number;
 

@@ -1,5 +1,5 @@
-import { OrderEntity } from "@/database/entities/order.entity";
-import { OrderStatus } from "@/database/enums/order-status.enum";
+import { OrderEntity } from '@/database/entities/order.entity';
+import { OrderStatus } from '@/database/enums/order-status.enum';
 
 export interface OrderWithRelations {
   id: number;

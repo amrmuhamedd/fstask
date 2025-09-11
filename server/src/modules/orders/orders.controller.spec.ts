@@ -7,12 +7,12 @@ import { IOrderRepository } from '@/database/repositories/interfaces/order.repos
 import { IStoreRepository } from '@/database/repositories/interfaces/store.repository.interface';
 import { IStoreTransactionEventRepository } from '@/database/repositories/interfaces/store-transaction-event.repository.interface';
 import { REPOSITORY_TOKENS } from '@/database/repositories/constants';
-import { TransactionType } from '@/database/entities/store-transaction-event.entity';
+// Removed unused import: TransactionType
 import { OrderStatus } from '@/database/enums/order-status.enum';
 
 describe('OrdersController', () => {
   let ordersController: OrdersController;
-  let ordersService: OrdersService;
+  // Service instance used for injection but not directly in tests
 
   const mockOrderRepository: jest.Mocked<IOrderRepository> = {
     findOrdersWithRelations: jest.fn().mockResolvedValue([
@@ -37,11 +37,12 @@ describe('OrdersController', () => {
     saveStore: jest.fn(),
   };
 
-  const mockStoreTransactionEventRepository: jest.Mocked<IStoreTransactionEventRepository> = {
-    findTransactionsByStoreId: jest.fn(),
-    recordTransaction: jest.fn(),
-    calculateBalanceFromEvents: jest.fn(),
-  };
+  const mockStoreTransactionEventRepository: jest.Mocked<IStoreTransactionEventRepository> =
+    {
+      findTransactionsByStoreId: jest.fn(),
+      recordTransaction: jest.fn(),
+      calculateBalanceFromEvents: jest.fn(),
+    };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -64,7 +65,6 @@ describe('OrdersController', () => {
     }).compile();
 
     ordersController = module.get<OrdersController>(OrdersController);
-    ordersService = module.get<OrdersService>(OrdersService);
   });
 
   describe('listOrders', () => {
@@ -159,17 +159,19 @@ describe('OrdersController', () => {
       mockOrderRepository.findOrderById.mockResolvedValue(order as OrderEntity);
       mockStoreRepository.findStoreById.mockResolvedValue(store as StoreEntity);
 
-      await expect(ordersController.cancelOrder('1', { refund: true })).rejects.toThrow(
-        'Cannot process refund due to insufficient store balance'
+      await expect(
+        ordersController.cancelOrder('1', { refund: true }),
+      ).rejects.toThrow(
+        'Cannot process refund due to insufficient store balance',
       );
     });
 
     it('should throw error when order is not found', async () => {
       mockOrderRepository.findOrderById.mockResolvedValue(null);
 
-      await expect(ordersController.cancelOrder('999', { refund: false })).rejects.toThrow(
-        'Order not found'
-      );
+      await expect(
+        ordersController.cancelOrder('999', { refund: false }),
+      ).rejects.toThrow('Order not found');
     });
   });
 });

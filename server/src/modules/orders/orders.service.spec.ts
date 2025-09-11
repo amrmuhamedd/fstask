@@ -7,7 +7,10 @@ import { IStoreTransactionEventRepository } from '@/database/repositories/interf
 import { OrderEntity } from '@/database/entities/order.entity';
 import { StoreEntity } from '@/database/entities/store.entity';
 import { TransactionType } from '@/database/entities/store-transaction-event.entity';
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { OrderStatus } from '@/database/enums/order-status.enum';
 
 describe('OrdersService', () => {
@@ -28,7 +31,7 @@ describe('OrdersService', () => {
       findStoreById: jest.fn(),
       saveStore: jest.fn(),
     };
-    
+
     storeTransactionEventRepository = {
       findTransactionsByStoreId: jest.fn(),
       recordTransaction: jest.fn(),
@@ -87,36 +90,40 @@ describe('OrdersService', () => {
       expect(orderRepository.findOrdersWithRelations).toHaveBeenCalled();
     });
   });
-  
+
   describe('cancelOrder', () => {
     it('should throw NotFoundException when order does not exist', async () => {
       // Arrange
       orderRepository.findOrderById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.cancelOrder('1', false)).rejects.toThrow(NotFoundException);
+      await expect(service.cancelOrder('1', false)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(orderRepository.findOrderById).toHaveBeenCalledWith(1);
     });
 
     it('should cancel order without refund', async () => {
       // Arrange
       const mockDate = new Date();
-      jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
-      
+      jest
+        .spyOn(global, 'Date')
+        .mockImplementation(() => mockDate as unknown as Date);
+
       const mockOrder = {
         id: 1,
         store_id: 1,
         customer_id: 1,
-        status: 'CONFIRMED' as 'CONFIRMED',
+        status: 'CONFIRMED' as const,
         amount_cents: 1000,
         created_at: new Date('2023-01-01'),
         updated_at: new Date('2023-01-01'),
       };
-      
+
       orderRepository.findOrderById.mockResolvedValue(mockOrder as OrderEntity);
       orderRepository.saveOrder.mockResolvedValue({
         ...mockOrder,
-        status: 'CANCELLED' as 'CANCELLED',
+        status: 'CANCELLED' as const,
         updated_at: mockDate,
       } as OrderEntity);
 
@@ -137,25 +144,25 @@ describe('OrdersService', () => {
       });
       expect(storeRepository.findStoreById).not.toHaveBeenCalled();
     });
-    
+
     it('should throw NotFoundException when store does not exist for refund', async () => {
       // Arrange
       const mockOrder = {
         id: 1,
         store_id: 1,
         customer_id: 1,
-        status: 'CONFIRMED' as 'CONFIRMED',
+        status: 'CONFIRMED' as const,
         amount_cents: 1000,
         created_at: new Date(),
         updated_at: new Date(),
       };
-      
+
       orderRepository.findOrderById.mockResolvedValue(mockOrder as OrderEntity);
       storeRepository.findStoreById.mockResolvedValue(null);
 
       // Act & Assert
       await expect(service.cancelOrder('1', true)).rejects.toThrow(
-        new NotFoundException('Store not found')
+        new NotFoundException('Store not found'),
       );
     });
 
@@ -165,49 +172,53 @@ describe('OrdersService', () => {
         id: 1,
         store_id: 1,
         customer_id: 1,
-        status: 'CONFIRMED' as 'CONFIRMED',
+        status: 'CONFIRMED' as const,
         amount_cents: 1000,
         created_at: new Date(),
         updated_at: new Date(),
       };
-      
+
       const mockStore = {
         id: 1,
         name: 'Test Store',
         balance_cents: 500, // Less than order amount
       };
-      
+
       orderRepository.findOrderById.mockResolvedValue(mockOrder as OrderEntity);
       storeRepository.findStoreById.mockResolvedValue(mockStore as StoreEntity);
 
       // Act & Assert
-      await expect(service.cancelOrder('1', true)).rejects.toThrow(UnprocessableEntityException);
+      await expect(service.cancelOrder('1', true)).rejects.toThrow(
+        UnprocessableEntityException,
+      );
       expect(storeRepository.saveStore).not.toHaveBeenCalled();
     });
 
     it('should cancel order with refund when store has sufficient balance', async () => {
       // Arrange
       const mockDate = new Date();
-      jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
-      
+      jest
+        .spyOn(global, 'Date')
+        .mockImplementation(() => mockDate as unknown as Date);
+
       const mockOrder = {
         id: 1,
         store_id: 1,
         customer_id: 1,
-        status: 'CONFIRMED' as 'CONFIRMED',
+        status: 'CONFIRMED' as const,
         amount_cents: 1000,
         created_at: new Date('2023-01-01'),
         updated_at: new Date('2023-01-01'),
       };
-      
+
       const mockStore = {
         id: 1,
         name: 'Test Store',
         balance_cents: 2000, // More than order amount
       };
-      
+
       const newBalance = 1000; // Balance after deduction
-      
+
       orderRepository.findOrderById.mockResolvedValue(mockOrder as OrderEntity);
       storeRepository.findStoreById.mockResolvedValue(mockStore as StoreEntity);
       storeRepository.saveStore.mockResolvedValue({
@@ -216,7 +227,7 @@ describe('OrdersService', () => {
       } as StoreEntity);
       orderRepository.saveOrder.mockResolvedValue({
         ...mockOrder,
-        status: 'CANCELLED' as 'CANCELLED',
+        status: 'CANCELLED' as const,
         updated_at: mockDate,
       } as OrderEntity);
       storeTransactionEventRepository.recordTransaction.mockResolvedValue({
@@ -227,7 +238,7 @@ describe('OrdersService', () => {
         balance_after_cents: newBalance,
         order_id: 1,
         description: 'Refund for cancelled order #1',
-        created_at: mockDate
+        created_at: mockDate,
       });
 
       // Act
@@ -256,7 +267,7 @@ describe('OrdersService', () => {
         -mockOrder.amount_cents,
         newBalance,
         mockOrder.id,
-        `Refund for cancelled order #${mockOrder.id}`
+        `Refund for cancelled order #${mockOrder.id}`,
       );
     });
   });

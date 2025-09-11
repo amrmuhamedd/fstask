@@ -11,7 +11,13 @@ import { StoreRepository } from '@/database/repositories/store.repository';
 import { StoreTransactionEventRepository } from '@/database/repositories/store-transaction-event.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderEntity, StoreEntity, StoreTransactionEventEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      OrderEntity,
+      StoreEntity,
+      StoreTransactionEventEntity,
+    ]),
+  ],
   controllers: [OrdersController],
   providers: [
     OrdersService,

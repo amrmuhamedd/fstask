@@ -13,7 +13,7 @@ export class StoreRepository implements IStoreRepository {
 
   async findStoreById(id: number): Promise<StoreEntity | null> {
     return this.storeEntityRepository.findOne({
-      where: { id }
+      where: { id },
     });
   }
 

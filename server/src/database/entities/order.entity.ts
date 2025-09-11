@@ -12,10 +12,10 @@ export class OrderEntity {
   @Column({ type: 'int' })
   customer_id: number;
 
-  @Column({ 
-    type: 'text', 
+  @Column({
+    type: 'text',
     default: OrderStatus.PENDING_PAYMENT,
-    enum: OrderStatus
+    enum: OrderStatus,
   })
   status: OrderStatus;
 

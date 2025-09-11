@@ -10,7 +10,12 @@ import { StoreTransactionEventEntity } from './entities/store-transaction-event.
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'database/db.sqlite',
-      entities: [OrderEntity, StoreEntity, CustomerEntity, StoreTransactionEventEntity],
+      entities: [
+        OrderEntity,
+        StoreEntity,
+        CustomerEntity,
+        StoreTransactionEventEntity,
+      ],
       synchronize: false,
       logging: true,
     }),

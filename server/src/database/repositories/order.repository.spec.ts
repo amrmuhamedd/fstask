@@ -73,9 +73,7 @@ describe('OrderRepository', () => {
         },
       ]);
 
-      expect(orderEntityRepository.createQueryBuilder).toHaveBeenCalledWith(
-        'order',
-      );
+      expect(orderEntityRepository.createQueryBuilder).toHaveBeenCalledWith('order');
       expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledTimes(2);
       expect(mockQueryBuilder.select).toHaveBeenCalled();
       expect(mockQueryBuilder.getRawMany).toHaveBeenCalled();

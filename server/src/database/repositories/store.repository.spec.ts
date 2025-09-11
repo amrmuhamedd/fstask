@@ -36,10 +36,10 @@ describe('StoreRepository', () => {
   describe('findStoreById', () => {
     it('should find a store by id', async () => {
       // Arrange
-      const mockStore = { 
-        id: 1, 
+      const mockStore = {
+        id: 1,
         name: 'Test Store',
-        balance_cents: 1000 
+        balance_cents: 1000,
       } as StoreEntity;
       storeEntityRepository.findOne.mockResolvedValue(mockStore);
 
@@ -68,17 +68,17 @@ describe('StoreRepository', () => {
   describe('saveStore', () => {
     it('should save a store', async () => {
       // Arrange
-      const storeToSave = { 
-        id: 1, 
+      const storeToSave = {
+        id: 1,
         name: 'Test Store',
-        balance_cents: 1000 
+        balance_cents: 1000,
       } as StoreEntity;
-      
-      const savedStore = { 
-        ...storeToSave, 
-        balance_cents: 2000 
+
+      const savedStore = {
+        ...storeToSave,
+        balance_cents: 2000,
       };
-      
+
       storeEntityRepository.save.mockResolvedValue(savedStore);
 
       // Act
